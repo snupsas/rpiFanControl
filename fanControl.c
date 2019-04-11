@@ -22,7 +22,7 @@ void writeToPwm(tempItem *item, uint8_t *profileSize, double *tValue);
 void main()
 {
 	// read config
-	uint8_t profileLineCount = readConfig(&profile[0]);
+	uint8_t profileLineCount = readConfig(profile);
 	if(profileLineCount == 0)
 	{
 		printf("Configuration file is empty. Exiting...\n");
@@ -39,7 +39,7 @@ void main()
 		double tValue = readTemperature();
 		
 		// calculate and write pwm value		
-		writeToPwm(&profile[0], &profileLineCount, &tValue);
+		writeToPwm(profile, &profileLineCount, &tValue);
 		
 		printf("%6.3f C.\n", tValue);
 		sleep(sleepTime);
