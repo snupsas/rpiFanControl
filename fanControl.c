@@ -112,7 +112,8 @@ void writeToPwm(tempItem *item, uint8_t *profileSize, double *tValue)
 		{	uint16_t pwmValue  = 1023 * profileValue->perc / 100;
 			printf("fan: %d -> PWM: %d\n", profileValue->perc, pwmValue);
 			pwmWrite(PWM_pin, pwmValue);
-			break;
+			return;
 		}
-	}	
+	}
+	pwmWrite(PWM_pin, 100); // fail-safe in case profile was not matched (spin fan at 100%)	
 }
