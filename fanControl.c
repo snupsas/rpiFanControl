@@ -12,7 +12,7 @@ typedef struct {
 tempItem profile[100];
 
 const int PWM_pin = 1; //GPIO 1 as per WiringPi, GPIO 18 as per BCM
-const uint8_t sleepTime = 5; // seconds
+const uint8_t sleepTime = 10; // seconds
 
 uint8_t readConfig(tempItem *item);
 void setupPwm();
@@ -31,6 +31,8 @@ void main()
 	
 	// setup PWM
 	setupPwm();
+	pwmWrite(PWM_pin, 0);
+	sleep(sleepTime);
 	
 	// main loop	
 	while(1)
@@ -41,7 +43,6 @@ void main()
 		// calculate and write pwm value		
 		writeToPwm(profile, &profileLineCount, &tValue);
 		
-		printf("%6.3f C.\n", tValue);
 		sleep(sleepTime);
 	}
 }
@@ -60,13 +61,12 @@ uint8_t readConfig(tempItem *item)
 	
 	// config read
 	uint8_t counter = 0;
-	while(fscanf(config, "%i,%i\n", &(item->temp), &(item->perc)) != EOF)
+	while(fscanf(config, "%i,%i\n", &(item[counter].temp), &(item[counter].perc)) != EOF)
 	{
 		counter++;
-		item++;
 	}
-	fclose(config);
 	
+	fclose(config);
 	return counter;
 }
 
@@ -103,17 +103,14 @@ double readTemperature()
 void writeToPwm(tempItem *item, uint8_t *profileSize, double *tValue)
 {
 	uint8_t i;
-	tempItem *profileValue;
-	
 	for(i = 0; i <= *profileSize; i++)
 	{	
-		profileValue = item + i;
-		if(profileValue->temp > *tValue)
-		{	uint16_t pwmValue  = 1023 * profileValue->perc / 100;
-			printf("fan: %d -> PWM: %d\n", profileValue->perc, pwmValue);
+		if(item[i].temp > *tValue)
+		{	uint16_t pwmValue  = 1023 * item[i].perc / 100;
+			printf("temp: %6.2f C -> fan: %d -> PWM: %d\n", *tValue, item[i].perc, pwmValue);
 			pwmWrite(PWM_pin, pwmValue);
 			return;
 		}
 	}
-	pwmWrite(PWM_pin, 100); // fail-safe in case profile was not matched (spin fan at 100%)	
+	pwmWrite(PWM_pin, 1023); // fail-safe in case profile was not matched (spin fan at 100%)	
 }
