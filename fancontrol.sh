@@ -17,7 +17,7 @@
 
 # Some things that run always
 set -e
-FANCONTROLDIR=/home/benas/gitSources/C/rpiFanControl
+FANCONTROLDIR=<PATH_GOES_HERE>
 
 # Carry out specific functions when asked to by the system
 case "$1" in
