@@ -14,15 +14,15 @@ tempItem profile[100];
 const int PWM_pin = 1; //GPIO 1 as per WiringPi, GPIO 18 as per BCM
 const uint8_t sleepTime = 10; // seconds
 
-uint8_t readConfig(tempItem *item);
+uint8_t readConfig(char *fileName, tempItem *item);
 void setupPwm();
 double readTemperature();
 void writeToPwm(tempItem *item, uint8_t *profileSize, double *tValue);
 
-void main()
+void main(int argc, char *argv[])
 {
 	// read config
-	uint8_t profileLineCount = readConfig(profile);
+	uint8_t profileLineCount = readConfig(argv[1], profile);
 	if(profileLineCount == 0)
 	{
 		printf("Configuration file is empty. Exiting...\n");
@@ -47,12 +47,14 @@ void main()
 	}
 }
 
-uint8_t readConfig(tempItem *item)
+uint8_t readConfig(char *fileName, tempItem *item)
 {
 	FILE *config;
 	
+	printf(fileName);
+	
 	// config file open
-	config = fopen("fanControl.cfg", "r");
+	config = fopen(fileName, "r");
 	if(config == NULL)
 	{
 		printf("Configuration file can not be read. Exiting...\n");
